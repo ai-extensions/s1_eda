@@ -1,0 +1,19 @@
+name: env_labels
+channels:
+  - conda-forge
+  - defaults
+  - terradue
+dependencies:
+  - python
+  - pystac
+  - numpy
+  - gdal
+  - shapely
+  - scikit-learn
+  - scikit-image
+  - ipykernel
+  - pandas
+  # - click2cwl
+  # - matplotlib
+  # - scipy
+  # - rasterio
