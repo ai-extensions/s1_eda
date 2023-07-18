@@ -1,4 +1,4 @@
-name: env_labels
+name: env_labels_light
 channels:
   - conda-forge
   - defaults
@@ -8,12 +8,6 @@ dependencies:
   - python >=3.6
   - numpy
   - gdal
-  - shapely
   - scikit-learn
-  - scikit-image
   - ipykernel
   - pandas
-  # - click2cwl
-  # - matplotlib
-  # - scipy
-  # - rasterio
