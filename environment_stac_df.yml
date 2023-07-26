@@ -1,0 +1,14 @@
+name: env_stac_df
+channels:
+  - conda-forge
+  - defaults
+  - terradue
+dependencies:
+  - pystac>=1.4.0
+  - python >=3.6
+  - numpy
+  - gdal
+  - scikit-learn
+  - ipykernel
+  - pandas
+  - matplotlib
