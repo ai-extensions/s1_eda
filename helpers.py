@@ -8,6 +8,7 @@ import folium
 from osgeo import gdal, ogr, osr
 import pyproj
 import numpy as np
+import numpy.ma as ma
 import pandas as pd
 
 gdal.UseExceptions()
@@ -123,3 +124,38 @@ def extract_pixel_values(b_g, transformed_coords):
     b_rst = None
     
     return values
+
+
+def makeScatterPlot(band1,band2):
+    band1_data = stack.sel(band=band1).values
+    band2_data = stack.sel(band=band2).values
+    
+    # Ensure the two bands have the same shape (e.g., if they are rasters, they should have the same dimensions)
+    assert band1_data.shape == band2_data.shape, "The two bands must have the same shape."
+
+    # Create masked arrays to handle NaN values
+    mask1 = np.isnan(band1_data)
+    mask2 = np.isnan(band2_data)
+
+    masked_band1_data = ma.masked_array(band1_data, mask=mask1)
+    masked_band2_data = ma.masked_array(band2_data, mask=mask2)
+
+    # Calculate the correlation coefficient while ignoring NaN values
+    correlation_coefficient = ma.corrcoef(masked_band1_data.flatten(), masked_band2_data.flatten())[0, 1]
+
+    # Create a scatter plot to visualize the correlation (optional)
+    plt.scatter(masked_band1_data, masked_band2_data, alpha=0.5)
+    plt.xlabel(band1)
+    plt.ylabel(band2)
+    plt.title(f"Correlation: {correlation_coefficient:.2f}")
+    plt.show()
+    
+    # # Heatmap of the correlation - need some work 
+    # heatmap_data = np.vstack((masked_band1_data.flatten(), masked_band2_data.flatten()))
+    # correlation_matrix = ma.corrcoef(heatmap_data)
+    # plt.imshow(correlation_matrix, cmap='coolwarm', origin='upper')
+    # plt.colorbar()
+    # plt.xticks([0, 1], [band1, band2])
+    # plt.yticks([0, 1], [band1, band2])
+    # plt.title("Correlation Heatmap")
+    # plt.show()
