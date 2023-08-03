@@ -5,6 +5,14 @@ import sys
 import pprint
 import folium
 
+from osgeo import gdal, ogr, osr
+import pyproj
+import numpy as np
+import pandas as pd
+
+gdal.UseExceptions()
+
+# Functions
 
 def find_centroid(bboxes):
     total_x = 0
@@ -109,3 +117,53 @@ def showMap_BBOX(items):
     folium.LayerControl().add_to(mymap)
 
     return mymap
+
+
+# Read GeoJSON file and extract point coordinates
+def read_geojson_coordinates(geojson_file):
+    with open(geojson_file, 'r') as file:
+        geojson_data = json.load(file)
+    #for f in geojson_data['features'][:10]: print(f)
+    
+    points = []
+    luc = []
+    for feature in geojson_data['features']:
+        if feature['geometry']['type'] == 'Point':
+            # Add lon and lat
+            lon, lat, _ = feature['geometry']['coordinates']
+            points.append((lon, lat))
+            
+            # Add classification 
+            luc.append(feature['properties']['class'])
+    return points, luc
+
+
+# Function to transform unprojected coordinates to projected coordinates
+def transform_coordinates(coordinates, epsg_s, epsg_t):
+    source_crs = pyproj.CRS(f'EPSG:{epsg_s}') 
+    target_crs = pyproj.CRS(f'EPSG:{epsg_t}')  
+    transformer = pyproj.Transformer.from_crs(source_crs, target_crs, always_xy=True)
+    transformed_coords = [transformer.transform(lon, lat) for lon, lat in coordinates]
+    
+    transformed_coords_int = [[int(tc[0]), int(tc[1])] for tc in transformed_coords]
+    return transformed_coords_int
+
+
+# Function to extract pixel values from a GeoTIFF at given coordinates
+def extract_pixel_values(b_g, transformed_coords):
+    gt = b_g.GetGeoTransform()
+    b_rst = b_g.GetRasterBand(1)
+    
+    values = []
+
+    for lon, lat in transformed_coords:
+        px = int((lon - gt[0]) / gt[1])  # Convert longitude to pixel x
+        py = int((lat - gt[3]) / gt[5])  # Convert latitude to pixel y
+
+        value = b_rst.ReadAsArray(px, py, 1, 1)[0][0]
+        values.append(value)
+    
+    # Empty raster 
+    b_rst = None
+    
+    return values

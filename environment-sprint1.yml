@@ -1,0 +1,25 @@
+name: env_sprint1
+channels:
+  - conda-forge
+  - defaults
+  - terradue
+dependencies:
+  - pystac>=1.4.0
+  - python >=3.6
+  - numpy
+  - gdal
+  - scikit-learn
+  - ipykernel
+  - pandas
+  - matplotlib
+  - pyproj
+  - seaborn
+  - Jinja2
+  - shapely
+  - pystac-client
+  - pystac
+  - jupyterlab
+  - matplotlib
+  - xarray
+  - stackstac
+  - folium
